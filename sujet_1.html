@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcul de Prime | Entreprise NASSIM</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Global style */
+        body {
+            background-color: #f7f9fb;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+        }
+
+        .prime-card {
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+        }
+
+        .prime-card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-container {
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-container {
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom {
+            background-color: #00bcd4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            background-color: #008c9e;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .vendeur-type label {
+            cursor: pointer;
+            padding: 12px 18px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            background-color: #f0f4f7;
+            border: 1px solid #ddd;
+        }
+
+        .vendeur-type input[type="radio"]:checked + label {
+            background-color: #00bcd4;
+            color: white;
+            border-color: #00bcd4;
+        }
+
+        .prime-result {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .heading {
+            font-size: 1.8rem;
+            color: #00bcd4;
+            font-weight: bold;
+        }
+
+        .sub-heading {
+            font-size: 1.1rem;
+            color: #777;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1rem;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="prime-card form-container">
+                    <div class="text-center mb-4">
+                        <img src="https://via.placeholder.com/100x50?text=NASSIM" alt="Logo NASSIM" class="mb-3">
+                        <h1 class="h3 heading">Calculateur de Prime</h1>
+                        <p class="sub-heading">Calculez la prime mensuelle pour vos vendeurs</p>
+                    </div>
+
+                    <form id="primeForm">
+                        <div class="mb-4">
+                            <label for="tableauxVendus" class="form-label fw-bold">Nombre de tableaux vendus</label>
+                            <input type="number" class="form-control form-control-lg" id="tableauxVendus" min="0" placeholder="Entrez le nombre">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="moisVente" class="form-label fw-bold">Mois de vente</label>
+                            <select class="form-select form-select-lg" id="moisVente">
+                                <!-- Options will be filled dynamically -->
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <p class="fw-bold mb-3">Type de vendeur</p>
+                            <div class="d-flex gap-3 vendeur-type">
+                                <div class="flex-grow-1">
+                                    <input type="radio" class="btn-check" name="vendeurType" id="vendeurOccasionnel" value="occasionnel" checked>
+                                    <label for="vendeurOccasionnel" class="btn btn-outline-primary w-100">
+                                        <i class="bi bi-person me-2"></i> Vendeur Occasionnel
+                                    </label>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="radio" class="btn-check" name="vendeurType" id="vendeurPermanent" value="permanent">
+                                    <label for="vendeurPermanent" class="btn btn-outline-primary w-100">
+                                        <i class="bi bi-person-fill me-2"></i> Vendeur Permanent
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="button" class="btn btn-custom btn-lg" id="btnCalculer">
+                                <i class="bi bi-calculator me-2"></i> Calculer la Prime
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="resultatContainer" class="prime-card bg-white p-4 text-center result-container">
+                    <h2 class="h4 mb-3 heading">Résultat du Calcul</h2>
+                    <div class="prime-result mb-3">
+                        <span id="montantPrime">0</span> DH
+                    </div>
+                    <p class="text-muted mb-0" id="detailCalcul"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Remplir les mois dynamiquement
+            const selectMois = document.getElementById('moisVente');
+            for (let i = 1; i <= 12; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Mois ${i}`;
+                selectMois.appendChild(option);
+            }
+
+            // Gestionnaire de calcul
+            document.getElementById('btnCalculer').addEventListener('click', function() {
+                try {
+                    const tableaux = parseInt(document.getElementById('tableauxVendus').value);
+                    const mois = parseInt(document.getElementById('moisVente').value);
+                    const vendeurType = document.querySelector('input[name="vendeurType"]:checked').value;
+
+                    // Validation
+                    if (isNaN(tableaux) || tableaux < 0) {
+                        throw new Error("Veuillez entrer un nombre valide et positif de tableaux");
+                    }
+
+                    // Calcul de la prime
+                    let taux, description;
+                    if (vendeurType === "occasionnel") {
+                        if (mois >= 1 && mois <= 6) {
+                            taux = 50;
+                            description = "50 DH par tableau (Mois 1-6)";
+                        } else {
+                            taux = 25;
+                            description = "25 DH par tableau (Mois 7-12)";
+                        }
+                    } else {
+                        if (mois >= 7 && mois <= 12) {
+                            taux = 40;
+                            description = "40 DH par tableau (Mois 7-12)";
+                        } else {
+                            taux = 20;
+                            description = "20 DH par tableau (Mois 1-6)";
+                        }
+                    }
+
+                    const prime = tableaux * taux;
+                    
+                    // Affichage du résultat
+                    document.getElementById('montantPrime').textContent = prime;
+                    document.getElementById('detailCalcul').textContent = 
+                        `${tableaux} tableaux × ${description} = ${prime} DH`;
+                    
+                    document.getElementById('resultatContainer').style.display = 'block';
+                    
+                    // Animation
+                    const resultContainer = document.getElementById('resultatContainer');
+                    resultContainer.style.opacity = 0;
+                    resultContainer.style.transform = 'translateY(20px)';
+                    resultContainer.animate([ 
+                        { opacity: 0, transform: 'translateY(20px)' },
+                        { opacity: 1, transform: 'translateY(0)' }
+                    ], {
+                        duration: 500,
+                        fill: 'forwards'
+                    });
+
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
